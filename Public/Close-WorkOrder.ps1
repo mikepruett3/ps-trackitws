@@ -17,7 +17,7 @@ function Close-WorkOrder {
 
     param (
         [Parameter(Mandatory=$True)]
-        [Int]$WorkOrder
+        [String]$WorkOrder
     )
 
     begin {
@@ -29,7 +29,7 @@ function Close-WorkOrder {
         Try {
             # Querying Track-it! Web API
             $Query = Invoke-RestMethod -Method Post -Uri ($RootURI + '/workorder/Close/' + $WorkOrder) -Headers $AuthHeader -ContentType $contentType -ErrorAction Stop
-            Write-Verbose "Work Order Created!"
+            Write-Verbose "Work Order Closed!"
             # Building new Object of results from the Post
             $Temp = New-Object System.Object
             $Temp | Add-Member -MemberType NoteProperty -Name "Success" -Value $Query.success
