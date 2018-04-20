@@ -1,6 +1,6 @@
-# PowerShell Toggl.com Download Tools (ps-toggldl)
+# PowerShell Track-it! WebService API Tools (ps-trackitws)
 
-Module created to allow for easy extraction of Time Data from Toggl's API, via PowerShell Invoke-WebRequest cmdlets. For use with other cmdlets and scripts.
+Module created to allow for Work Order Operations from Track-it!'s WebService API, via PowerShell Invoke-WebRequest cmdlets. For use with other cmdlets and scripts.
 
 ## Installation
 
@@ -8,65 +8,70 @@ Clone the repository into your **$Home\Documents\WindowsPowerShell\Modules** fol
 
 ```powershell
 cd $Home\Documents\WindowsPowerShell\Modules\
-git clone git@github.com:mikepruett3/ps-toggldl.git
+git clone git@github.com:mikepruett3/ps-trackitws.git
 ```
 
 Then you can import the custom module into your running shell...
 
 ```powershell
-Import-Module ps-toggldl
+Import-Module ps-trackitws
 ```
 
 ## Usage
 
-### Connect to Toggl's API
+### Connect to Track-it!'s WebService API
 
 Running this function will create a Global Variable which is used with subsequent functions of this module.
 
-This function is looking for two User-Defined Environment Variables:
+This function is looking for two parameters at runtime...
 
-| Variable | Description|
+| Parameter | Description|
 |:---|:---|
-| Toggl_Api | The [API key](https://toggl.com/app/profile) provided by Toggl.com|
-| Toggl_Workspace | The [Workspace ID](https://toggl.com/app/workspaces) provided by Toggl.com |
+| Server | The server name (Fully-Qualified) of the server running the Track-it! WebService API instance. |
+| Credentials | The credentials used to connect to the Track-it! WebService API. These credentials must be configured with the Technician Role. |
 
 Once you have these Environment Variables, run the following:
 
 ```powershell
-Connect-Toggl
+Connect-Trackit -Server <server-name> -Credentials <username>
 ```
 
-If no User-Defined Environment Variables are defined, the function is expecting these as Parameters:
+### Create WorkOrder
+
+Creating a new WorkOrder in Track-it! WebService API can be performed by the following:
 
 ```powershell
-Connect-Toggl -Apitoken <Toggl-API-Token> -Workspace <Workspace-Token>
+New-WorkOrder -Summary 'Description of the problem' `
+              -Status 'Open' #Cannot create a Closed ticket, must allways be open! `
+              -Technician 'Your Name' `
+              -Requestor 'Requestors Name' `
+              -Company 'Company Name' `
+              -Priority 'WorkOrder Priorty' `
+              -Category 'WorkOrder Type' `
+              -Type 'WorkOrder Type' `
+              -SubType 'WorkOrder SubType' `
+              -Computer 'Computer or Asset Name (if required)' `
 ```
 
+### Retrieve WorkOrder
 
-### Retrieve Time Entry Data from API
-
-Retrieving Time Entry Data from Toggl's API can be performed by the following:
+Retrieving an existing WorkOrder in Track-it! WebService API can be performed by the following:
 
 ```powershell
-Get-Summary
+Get-WorkOrder -WorkOrder 'WorkOrder Number'
 ```
 
-Which will return a PowerShell Object of all of the data from the last 24 hours (Earliest point at midnight). You can use the **-Detail** method to retrieve full Time Entry data, instead of a summary
+### Close WorkOrder
+
+Closing an existing WorkOrder in Track-it! WebService API can be performed by the following:
 
 ```powershell
-Get-Summary -Detail
+Close-WorkOerder -WorkOrder 'WorkOrder Number'
 ```
 
-If you want to return data from an older point, you can provide a negative integer in the **-Days** method.
+### Disconnecting from Track-it! WebService API
 
 ```powershell
-Get-Summary -Days -5
+Disconnect-Trackit
 ```
 
-You can also use the following to retrieve the data, and place it in a CSV file
-
-```powershell
-Get-Summary | Export-Csv -Path \path\to\file\<filename.csv> -NoTypeInformation
-```
-
-Important to use the **-NoTypeInformation**, to strip the type information from the CSV file
