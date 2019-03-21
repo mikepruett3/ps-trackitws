@@ -49,10 +49,9 @@ function Connect-Trackit {
 
     process {
         # Get APIKey from Track-it! Web API
+        Write-Verbose "Generating API Token from $Server"
         Try {
             $AuthResult = Invoke-RestMethod -Method GET -Uri ($RootURI + '/login?username=' + $username + '&pwd=' + $password ) -ContentType $contentType -ErrorAction Stop
-            $Global:AuthHeader = @{"TrackItAPIKey" = ($AuthResult.data.apiKey)}
-            Write-Verbose "Auth Token Generated Successfully"
         }
         Catch {  
             $result = $_.Exception.Response.GetResponseStream()
@@ -61,6 +60,13 @@ function Connect-Trackit {
             $reader.DiscardBufferedData()
             $responseBody = $reader.ReadToEnd();
             Write-Host -ForegroundColor Red $_ "---->" $responseBody
+            Break
+        }
+        if ( $AuthResult.success -ne 'false' ){
+            Write-Verbose "Recieved APIKey $($AuthResult.data.apiKey) from $Server"
+            $Global:AuthHeader = @{"TrackItAPIKey" = ($AuthResult.data.apiKey)}
+        } else {
+            Write-Error "Error: $($AuthResult.data.Code) - $($AuthResult.data.Message)"
             Break
         }
     }
